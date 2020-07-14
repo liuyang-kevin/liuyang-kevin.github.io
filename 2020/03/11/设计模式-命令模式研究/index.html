@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>设计模式 -- 命令模式研究 | Kevin Liu 的简单博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="命令模式封装一个请求或行为作为一个对象。封装的请求比原来的更加灵活，可以在对象之间传递，储存，动态修改，或放入一个队列。  在复杂App的开发过程中，对于功能的高耦合性一直是我头疼的地方。我一直觉得命令模式是一种合适的解决方法。这次就系统的学习一番">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设计模式 -- 命令模式研究">
+<meta property="og:url" content="http://yoursite.com/2020/03/11/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F%E7%A0%94%E7%A9%B6/index.html">
+<meta property="og:site_name" content="Kevin Liu 的简单博客">
+<meta property="og:description" content="命令模式封装一个请求或行为作为一个对象。封装的请求比原来的更加灵活，可以在对象之间传递，储存，动态修改，或放入一个队列。  在复杂App的开发过程中，对于功能的高耦合性一直是我头疼的地方。我一直觉得命令模式是一种合适的解决方法。这次就系统的学习一番">
+<meta property="og:locale" content="zh">
+<meta property="og:image" content="http://yoursite.com/images/2020/03/13/e0b3b9f0-648e-11ea-bf5c-f36cf7f72e81.png">
+<meta property="article:published_time" content="2020-03-11T10:00:43.000Z">
+<meta property="article:modified_time" content="2020-07-14T04:37:13.095Z">
+<meta property="article:author" content="Kevin 刘洋">
+<meta property="article:tag" content="dart">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/images/2020/03/13/e0b3b9f0-648e-11ea-bf5c-f36cf7f72e81.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Kevin Liu 的简单博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Kevin Liu 的简单博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">全干工程师</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-设计模式-命令模式研究" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/11/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F%E7%A0%94%E7%A9%B6/" class="article-date">
+  <time datetime="2020-03-11T10:00:43.000Z" itemprop="datePublished">2020-03-11</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/">其他技能</a>►<a class="article-category-link" href="/categories/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/Flutter/">Flutter</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      设计模式 -- 命令模式研究
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>命令模式封装一个请求或行为作为一个对象。封装的请求比原来的更加灵活，可以在对象之间传递，储存，动态修改，或放入一个队列。</p>
+</blockquote>
+<p>在复杂App的开发过程中，对于功能的高耦合性一直是我头疼的地方。我一直觉得命令模式是一种合适的解决方法。这次就系统的学习一番</p>
+<a id="more"></a>
+
+<p>优点：</p>
+<ol>
+<li>事件产生<em>命令</em>，多个<em>命令</em>可以形成<strong>队列</strong>逐个执行</li>
+<li>执行程序可以<strong>派发</strong>、<strong>选择</strong>性执行</li>
+<li>可以实现<strong>撤销</strong>，<strong>重复</strong>功能</li>
+<li>增量功能，不影响其他程序</li>
+<li>分离请求者与执行者</li>
+</ol>
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p><img src="/images/2020/03/13/e0b3b9f0-648e-11ea-bf5c-f36cf7f72e81.png" alt="image.png"></p>
+<ol>
+<li>发送者 （Sender）——亦称 “触发者 （Invoker）”——类负责对请求进行初始化， 其中必须包含一个成员变量来存储对于命令对象的引用。 发送者触发命令， 而不向接收者直接发送请求。 注意， 发送者并不负责创建命令对象： 它通常会通过构造函数从客户端处获得预先生成的命令。</li>
+<li>命令 （Command） 接口通常仅声明一个执行命令的方法。</li>
+<li>具体命令 （Concrete Commands） 会实现各种类型的请求。 具体命令自身并不完成工作， 而是会将调用委派给一个业务逻辑对象。 但为了简化代码， 这些类可以进行合并。<ol>
+<li>接收对象执行方法所需的参数可以声明为具体命令的成员变量。 你可以将命令对象设为不可变， 仅允许通过构造函数对这些成员变量进行初始化。</li>
+</ol>
+</li>
+<li>接收者 （Receiver） 类包含部分业务逻辑。 几乎任何对象都可以作为接收者。 绝大部分命令只处理如何将请求传递到接收者的细节， 接收者自己会完成实际的工作。</li>
+<li>客户端 （Client） 会创建并配置具体命令对象。 客户端必须将包括接收者实体在内的所有请求参数传递给命令的构造函数。 此后， 生成的命令就可以与一个或多个发送者相关联了。</li>
+</ol>
+<h1 id="要点解析"><a href="#要点解析" class="headerlink" title="要点解析"></a>要点解析</h1><ul>
+<li>Client是才是执行的主体，针对不同的场景可以实例多个客户端C<ul>
+<li>C中统筹invoker，择机执行invoker触发函数。</li>
+<li>invoker中可复合多个Command，</li>
+</ul>
+</li>
+<li>invoker作为调用手段，可先实例，并选择合适的时机触发执行</li>
+<li>Concrete Command实例可以复合多个Receiver协同工作</li>
+</ul>
+<h1 id="适用地点"><a href="#适用地点" class="headerlink" title="适用地点"></a>适用地点</h1><ul>
+<li>复杂的编辑器，保存文件、另存为文件、关闭自动保存等，都适用命令模式分解最小执行单元。</li>
+</ul>
+<h1 id="Link："><a href="#Link：" class="headerlink" title="Link："></a>Link：</h1><p><a href="https://refactoringguru.cn/design-patterns/command" target="_blank" rel="noopener">design-patterns</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/03/11/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F-%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F%E7%A0%94%E7%A9%B6/" data-id="ckcli33ti002y186ncicr7g1t" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dart/" rel="tag">dart</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/03/13/flutter%E7%BC%BA%E5%B0%91%E5%8F%8D%E5%B0%84%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          flutter缺少反射的解决方案
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/03/05/JNI%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E4%B8%8E%E4%BD%BF%E7%94%A8%E3%80%82/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">JNI快速理解与使用。</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/">其他技能</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/">Flutter</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/Android/">Android</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/iOS/">iOS</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/">其他技能</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/Flutter/">Flutter</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%8E%9F%E7%90%86%E4%B8%8E%E5%9F%BA%E7%A1%80/">原理与基础</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dart/" rel="tag">dart</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/" rel="tag">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/" rel="tag">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kotlin/" rel="tag">kotlin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/net/" rel="tag">net</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/swift/" rel="tag">swift</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BD%AF%E4%BB%B6/" rel="tag">软件</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/c/" style="font-size: 17.5px;">c++</a> <a href="/tags/dart/" style="font-size: 20px;">dart</a> <a href="/tags/go/" style="font-size: 10px;">go</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/kotlin/" style="font-size: 12.5px;">kotlin</a> <a href="/tags/net/" style="font-size: 10px;">net</a> <a href="/tags/swift/" style="font-size: 12.5px;">swift</a> <a href="/tags/%E8%BD%AF%E4%BB%B6/" style="font-size: 15px;">软件</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/07/14/Github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2/">使用Github搭建博客</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/11/Dart-%E7%BC%96%E8%AF%91%E3%80%81%E5%90%AF%E5%8A%A8%E6%9C%8D%E5%8A%A1%E3%80%81%E5%92%8C%E6%B5%8B%E8%AF%95-web-%E5%BA%94%E7%94%A8%E7%9A%84-build-runner/">Dart 编译、启动服务、和测试 web 应用的 build_runner</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/07/LaTex-%E9%80%9F%E6%88%90%E6%89%8B%E5%86%8C/">LaTex 速成手册。</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/01/Dart-%E6%B3%A8%E8%A7%A3%EF%BC%8CAPT/">Dart 注解，APT</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/30/Flutter-%E5%8A%A8%E7%94%BB%E8%80%83%E7%A9%B6/">Flutter 动画考究</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 Kevin 刘洋<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

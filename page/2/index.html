@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Kevin Liu 的简单博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="android go cgo ffmpeg Flutter">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kevin Liu 的简单博客">
+<meta property="og:url" content="http://yoursite.com/page/2/index.html">
+<meta property="og:site_name" content="Kevin Liu 的简单博客">
+<meta property="og:description" content="android go cgo ffmpeg Flutter">
+<meta property="og:locale" content="zh">
+<meta property="article:author" content="Kevin 刘洋">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Kevin Liu 的简单博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Kevin Liu 的简单博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">全干工程师</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-Flutter-test-问题随笔" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/05/13/Flutter-test-%E9%97%AE%E9%A2%98%E9%9A%8F%E7%AC%94/" class="article-date">
+  <time datetime="2020-05-13T10:09:35.000Z" itemprop="datePublished">2020-05-13</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/05/13/Flutter-test-%E9%97%AE%E9%A2%98%E9%9A%8F%E7%AC%94/">Flutter test 问题随笔</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="关于集成测试"><a href="#关于集成测试" class="headerlink" title="关于集成测试"></a>关于集成测试</h1><ol>
+<li>App 本身权限申请不能太早，<ul>
+<li>执行过程中，会先删除App重新安装。比如插件初始化，申请授权太早，系统工具没有合适时机提前授权，从业务上解决最为合适</li>
+</ul>
+</li>
+<li>app.dart / app_test.dart,是配套文件，后者才是测序程序本体；<ul>
+<li>flutter drive –target=test_driver/app.dart 会自动寻找 *_test 文件</li>
+</ul>
+</li>
+<li>对于app_test.dart的参数，main函数args是不起效的。可以透过环境变量添加<ul>
+<li>shell: DACALL_T_CMD=push_notification,aaa flutter drive –target=test_driver/app.dart</li>
+<li>dart: Platform.environment[‘DACALL_T_CMD’].split(“,”);</li>
+</ul>
+</li>
+<li>需要手动修改pubspec，给开发依赖增加 <code>test</code> <code>flutter_driver</code></li>
+</ol>
+<h1 id="关于Android"><a href="#关于Android" class="headerlink" title="关于Android"></a>关于Android</h1><h2 id="授权框-阻挡了测试流程"><a href="#授权框-阻挡了测试流程" class="headerlink" title="授权框 阻挡了测试流程"></a>授权框 阻挡了测试流程</h2><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'dart:io'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'package:path/path.dart'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line">setUpAll(() <span class="keyword">async</span> &#123;</span><br><span class="line">  <span class="keyword">final</span> envVars = Platform.environment;</span><br><span class="line">  <span class="keyword">final</span> adbPath = join(</span><br><span class="line">    envVars[<span class="string">'ANDROID_SDK_ROOT'</span>] ?? envVars[<span class="string">'ANDROID_HOME'</span>],</span><br><span class="line">    <span class="string">'platform-tools'</span>,</span><br><span class="line">    Platform.isWindows ? <span class="string">'adb.exe'</span> : <span class="string">'adb'</span>,</span><br><span class="line">  );</span><br><span class="line">  <span class="keyword">await</span> Process.run(adbPath, [</span><br><span class="line">    <span class="string">'shell'</span>,</span><br><span class="line">    <span class="string">'pm'</span>,</span><br><span class="line">    <span class="string">'grant'</span>,</span><br><span class="line">    <span class="string">'com.example.yourapp'</span>, <span class="comment">// replace with your app id</span></span><br><span class="line">    <span class="string">'android.permission.RECORD_AUDIO'</span></span><br><span class="line">  ]);</span><br><span class="line">  driver = <span class="keyword">await</span> FlutterDriver.connect();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="adb-shell-命令"><a href="#adb-shell-命令" class="headerlink" title="adb shell 命令"></a>adb shell 命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> device all permissions output list</span></span><br><span class="line">adb shell pm list permissions -s -g</span><br><span class="line"><span class="meta">#</span><span class="bash"> output app permissions list</span></span><br><span class="line">adb shell dumpsys package com.xxxx.xxxx | grep permission</span><br><span class="line"><span class="meta">#</span><span class="bash"> adb 安装</span></span><br><span class="line">adb install "./build/app/outputs/apk/release/app-release.apk"</span><br><span class="line"><span class="meta">#</span><span class="bash"> 通过查询包名，点击启动，这个比包名+activity直接拉起要准确</span></span><br><span class="line">adb shell monkey -p com.fifthai.dacall -c android.intent.category.LAUNCHER 1</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/05/13/Flutter-test-%E9%97%AE%E9%A2%98%E9%9A%8F%E7%AC%94/" data-id="ckcli33sq000t186n9j9nateu" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-swift一些常用代码段" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/05/13/swift%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E4%BB%A3%E7%A0%81%E6%AE%B5/" class="article-date">
+  <time datetime="2020-05-13T03:28:02.000Z" itemprop="datePublished">2020-05-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Flutter/">Flutter</a>►<a class="article-category-link" href="/categories/Flutter/iOS/">iOS</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/05/13/swift%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E4%BB%A3%E7%A0%81%E6%AE%B5/">swift一些常用代码段</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近正在弄iOS的flutter插件，留档一些常用代码段；</p>
+<h1 id="iOS-debug模式打印"><a href="#iOS-debug模式打印" class="headerlink" title="iOS debug模式打印"></a>iOS debug模式打印</h1><p>说是放在全局。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">print</span><span class="params">(<span class="number">_</span> items: <span class="keyword">Any</span>..., separator: String = <span class="string">" "</span>, terminator: String = <span class="string">"\n"</span>)</span></span> &#123;</span><br><span class="line">    #<span class="keyword">if</span> <span class="type">DEBUG</span></span><br><span class="line">    items.forEach &#123;</span><br><span class="line">        <span class="type">Swift</span>.<span class="built_in">print</span>($<span class="number">0</span>, separator: separator, terminator: terminator)</span><br><span class="line">    &#125;</span><br><span class="line">    #endif</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>// 毫秒时间戳</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">extension</span> <span class="title">Date</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">currentTimeMillis</span><span class="params">()</span></span> -&gt; <span class="type">Int64</span> &#123;</span><br><span class="line">    <span class="type">Int64</span>(<span class="keyword">self</span>.timeIntervalSince1970 * <span class="number">1000</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>// 时间排序，获取文件夹列表</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">extension</span> <span class="title">FileManager</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="class"><span class="keyword">enum</span> <span class="title">ContentDate</span> </span>&#123;</span><br><span class="line">    <span class="keyword">case</span> created, modified, accessed</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> resourceKey: <span class="type">URLResourceKey</span> &#123;</span><br><span class="line">      <span class="keyword">switch</span> <span class="keyword">self</span> &#123;</span><br><span class="line">      <span class="keyword">case</span> .created: <span class="keyword">return</span> .creationDateKey</span><br><span class="line">      <span class="keyword">case</span> .modified: <span class="keyword">return</span> .contentModificationDateKey</span><br><span class="line">      <span class="keyword">case</span> .accessed: <span class="keyword">return</span> .contentAccessDateKey</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">contentsOfDirectory</span><span class="params">(atURL url: URL, sortedBy: ContentDate, ascending: Bool = <span class="literal">true</span>, options: FileManager.DirectoryEnumerationOptions = [.skipsHiddenFiles])</span></span> <span class="keyword">throws</span> -&gt; [<span class="type">String</span>]? &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> key = sortedBy.resourceKey</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> files = <span class="keyword">try</span> contentsOfDirectory(at: url, includingPropertiesForKeys: [key], options: options)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> files.<span class="built_in">sort</span> &#123;</span><br><span class="line"></span><br><span class="line">      <span class="keyword">let</span> values1 = <span class="keyword">try</span> $<span class="number">0</span>.resourceValues(forKeys: [key])</span><br><span class="line">      <span class="keyword">let</span> values2 = <span class="keyword">try</span> $<span class="number">1</span>.resourceValues(forKeys: [key])</span><br><span class="line"></span><br><span class="line">      <span class="keyword">if</span> <span class="keyword">let</span> date1 = values1.allValues.first?.value <span class="keyword">as</span>? <span class="type">Date</span>, <span class="keyword">let</span> date2 = values2.allValues.first?.value <span class="keyword">as</span>? <span class="type">Date</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> date1.compare(date2) == (ascending ? .orderedAscending : .orderedDescending)</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> files.<span class="built_in">map</span> &#123;</span><br><span class="line">      $<span class="number">0</span>.lastPathComponent</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 使用：</span></span><br><span class="line"><span class="comment">////            let sortedFileList = try FileManager.default.contentsOfDirectory(</span></span><br><span class="line"><span class="comment">////                atURL: dirPath,</span></span><br><span class="line"><span class="comment">////                sortedBy: FileManager.ContentDate.created, ascending: true, options: [.skipsHiddenFiles])</span></span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/05/13/swift%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E4%BB%A3%E7%A0%81%E6%AE%B5/" data-id="ckcli33te002k186nf1twgmsr" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/swift/" rel="tag">swift</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Flutter-一些控件属性注释" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/04/23/Flutter-%E4%B8%80%E4%BA%9B%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E6%B3%A8%E9%87%8A/" class="article-date">
+  <time datetime="2020-04-23T01:46:41.000Z" itemprop="datePublished">2020-04-23</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Flutter/">Flutter</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/04/23/Flutter-%E4%B8%80%E4%BA%9B%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E6%B3%A8%E9%87%8A/">Flutter 一些控件属性注释</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="TextStyle"><a href="#TextStyle" class="headerlink" title="TextStyle"></a>TextStyle</h1><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> TextStyle(&#123;</span><br><span class="line">    <span class="keyword">this</span>.inherit: <span class="keyword">true</span>,         <span class="comment">// 为false的时候不显示</span></span><br><span class="line">    <span class="keyword">this</span>.color,                    <span class="comment">// 颜色 </span></span><br><span class="line">    <span class="keyword">this</span>.fontSize,               <span class="comment">// 字号</span></span><br><span class="line">    <span class="keyword">this</span>.fontWeight,           <span class="comment">// 字重，加粗也用这个字段  FontWeight.w700</span></span><br><span class="line">    <span class="keyword">this</span>.fontStyle,                <span class="comment">// FontStyle.normal  FontStyle.italic斜体</span></span><br><span class="line">    <span class="keyword">this</span>.letterSpacing,        <span class="comment">// 字符间距  就是单个字母或者汉字之间的间隔，可以是负数</span></span><br><span class="line">    <span class="keyword">this</span>.wordSpacing,        <span class="comment">// 字间距 句字之间的间距</span></span><br><span class="line">    <span class="keyword">this</span>.textBaseline,        <span class="comment">// 基线，两个值，字面意思是一个用来排字母的，一人用来排表意字的（类似中文）</span></span><br><span class="line">    <span class="keyword">this</span>.height,                <span class="comment">// 当用来Text控件上时，行高（会乘以fontSize,所以不以设置过大）</span></span><br><span class="line">    <span class="keyword">this</span>.decoration,        <span class="comment">// 添加上划线，下划线，删除线 </span></span><br><span class="line">    <span class="keyword">this</span>.decorationColor,    <span class="comment">// 划线的颜色</span></span><br><span class="line">    <span class="keyword">this</span>.decorationStyle,    <span class="comment">// 这个style可能控制画实线，虚线，两条线，点, 波浪线等</span></span><br><span class="line">    <span class="keyword">this</span>.debugLabel,</span><br><span class="line">    <span class="built_in">String</span> fontFamily,    <span class="comment">// 字体</span></span><br><span class="line">    <span class="built_in">String</span> package,</span><br><span class="line">  &#125;) : fontFamily = package == <span class="keyword">null</span> ? fontFamily : <span class="string">'packages/<span class="subst">$package</span>/<span class="subst">$fontFamily</span>'</span>,</span><br><span class="line">       <span class="keyword">assert</span>(inherit != <span class="keyword">null</span>);</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/04/23/Flutter-%E4%B8%80%E4%BA%9B%E6%8E%A7%E4%BB%B6%E5%B1%9E%E6%80%A7%E6%B3%A8%E9%87%8A/" data-id="ckcli33ss000x186n0har5ecd" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dart/" rel="tag">dart</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Flutter-开发中可以使用的动画插件" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/04/09/Flutter-%E5%BC%80%E5%8F%91%E4%B8%AD%E5%8F%AF%E4%BB%A5%E4%BD%BF%E7%94%A8%E7%9A%84%E5%8A%A8%E7%94%BB%E6%8F%92%E4%BB%B6/" class="article-date">
+  <time datetime="2020-04-09T02:37:17.000Z" itemprop="datePublished">2020-04-09</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/04/09/Flutter-%E5%BC%80%E5%8F%91%E4%B8%AD%E5%8F%AF%E4%BB%A5%E4%BD%BF%E7%94%A8%E7%9A%84%E5%8A%A8%E7%94%BB%E6%8F%92%E4%BB%B6/">Flutter 开发中可以使用的动画插件</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Flare"><a href="#Flare" class="headerlink" title="Flare"></a>Flare</h1><p><a href="https://rive.app/explore/popular/trending/all" target="_blank" rel="noopener">官网</a>在线的编辑器，导出flr的二进制，也可以是json；开源的动画资源也很多；</p>
+<p>使用<a href="https://pub.dev/packages/flare_flutter" target="_blank" rel="noopener">flare_flutter</a>插件显示动画</p>
+<h1 id="lottie-、-Bodymovin"><a href="#lottie-、-Bodymovin" class="headerlink" title="lottie 、 Bodymovin"></a>lottie 、 Bodymovin</h1><p>Flutter 目前尚未完全支持 Airbnb 的 Lottie 框架，这是一种给 App 添加动画的流行方式。基于它设计人员可以使用 Bodymovin 插件从行业标准 Adobe After Effects 工具导出动画，然后直接导入到 iOS 和 Android App 中。<br>目前有一些插件可用，例如 lottie_flutter ，但它们仍有一些问题。</p>
+<p><a href="https://pub.dev/packages/lottie_flutter" target="_blank" rel="noopener">lottie_flutter</a></p>
+<h1 id="drawing-animation"><a href="#drawing-animation" class="headerlink" title="drawing_animation"></a>drawing_animation</h1><p>使用SVG做路径动画、貌似对svg有格式要求<br><a href="https://pub.dev/packages/drawing_animation" target="_blank" rel="noopener">drawing_animation</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/04/09/Flutter-%E5%BC%80%E5%8F%91%E4%B8%AD%E5%8F%AF%E4%BB%A5%E4%BD%BF%E7%94%A8%E7%9A%84%E5%8A%A8%E7%94%BB%E6%8F%92%E4%BB%B6/" data-id="ckcli33sw001a186n5m166iaf" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-解决flutter原生调用方法的一些问题" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/30/%E8%A7%A3%E5%86%B3flutter%E5%8E%9F%E7%94%9F%E8%B0%83%E7%94%A8%E6%96%B9%E6%B3%95%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/" class="article-date">
+  <time datetime="2020-03-30T02:16:04.000Z" itemprop="datePublished">2020-03-30</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Flutter/">Flutter</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/03/30/%E8%A7%A3%E5%86%B3flutter%E5%8E%9F%E7%94%9F%E8%B0%83%E7%94%A8%E6%96%B9%E6%B3%95%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/">解决flutter原生调用方法的一些问题</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>解决flutter原生调用方法的一些问题 </p>
+<ul>
+<li>Flutter 走通道调用; result是一次性消费;不可多用</li>
+<li>（ctl shift -） 折叠代码，便于查看</li>
+<li>可以考虑使用反射机制，解决Flutter与原生方法名映射问题。<ul>
+<li>java - this.javaClass.getMethod(call.method)</li>
+<li>Kotlin反射的效率差<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//&lt;editor-fold desc="预留 Kotlin反射的效率差"&gt;</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// Kotlin反射的效率问题，在Java中反射大概需要几十微秒，在Kotlin就需要几百甚至上千微秒，</span></span><br><span class="line">        <span class="comment">// 如果是通过反射访问对象或构造属性，甚至需要上万微秒，</span></span><br><span class="line">        <span class="keyword">val</span> refMethod = plugin::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>.<span class="title">getMethod</span></span>(call.method, MethodCall::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>, <span class="type">Result::class.java)</span></span></span><br><span class="line">        refMethod.invoke(plugin, call, result)</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e: NoSuchMethodException) &#123;</span><br><span class="line">        result.notImplemented()</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">//&lt;/editor-fold&gt;</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+<li>继承的方式，super方法hook到不同的父类解决不同层级的问题。</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/03/30/%E8%A7%A3%E5%86%B3flutter%E5%8E%9F%E7%94%9F%E8%B0%83%E7%94%A8%E6%96%B9%E6%B3%95%E7%9A%84%E4%B8%80%E4%BA%9B%E9%97%AE%E9%A2%98/" data-id="ckcli33th002w186nfyj2fzkw" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dart/" rel="tag">dart</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kotlin/" rel="tag">kotlin</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-android-enableR8-is-deprecated" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/28/android-enableR8-is-deprecated/" class="article-date">
+  <time datetime="2020-03-28T07:37:24.000Z" itemprop="datePublished">2020-03-28</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/03/28/android-enableR8-is-deprecated/">android.enableR8&#39; is deprecated</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>更新项目时候发现。</p>
+<blockquote>
+<p>build.gradle: The option ‘android.enableR8’ is deprecated and should not be used anymore.</p>
+</blockquote>
+<p>Android代码压缩工具R8</p>
+<p>R8 这一项工具的目的是让代码缩减过程更快和更有效率。</p>
+        
+          <p class="article-more-link">
+            <a href="/2020/03/28/android-enableR8-is-deprecated/#more">Read More</a>
+          </p>
+        
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/03/28/android-enableR8-is-deprecated/" data-id="ckcli33t5001z186n6fe12a2s" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-第五维度代码规范" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/28/%E7%AC%AC%E4%BA%94%E7%BB%B4%E5%BA%A6%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83/" class="article-date">
+  <time datetime="2020-03-28T03:46:42.000Z" itemprop="datePublished">2020-03-28</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/03/28/%E7%AC%AC%E4%BA%94%E7%BB%B4%E5%BA%A6%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83/">第五维度代码规范</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>重写方法在前，<br>class内部方法使用 下划线，放在重写方法之后</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/03/28/%E7%AC%AC%E4%BA%94%E7%BB%B4%E5%BA%A6%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83/" data-id="ckcli33tg002s186n6hh32kmk" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Flutter-ThemeData-属性含义" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/24/Flutter-ThemeData-%E5%B1%9E%E6%80%A7%E5%90%AB%E4%B9%89/" class="article-date">
+  <time datetime="2020-03-24T07:45:17.000Z" itemprop="datePublished">2020-03-24</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Flutter/">Flutter</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/03/24/Flutter-ThemeData-%E5%B1%9E%E6%80%A7%E5%90%AB%E4%B9%89/">Flutter ThemeData 属性含义</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <ul>
+<li>brightness - Brightness类型，应用程序的整体主题亮度。用于按钮等小部件，以确定在不使用主色（primaryColor）或强调色（accentColor）时选择什么颜色。当亮度较暗时，画布、卡片和原色都较暗。当亮度为光时，画布和卡片的颜色是明亮的，原色的暗度根据原色亮度变化。当亮度较暗时，原色（primaryColor）与卡片和画布颜色的对比度较差;当亮度较暗时，用白色或亮蓝色来对比。</li>
+<li>primarySwatch - MaterialColor 类型，Material 主题中定义一种颜色，它具有十种颜色阴影的颜色样本。值越大颜色越深，10个有效的index分别为：50，100，200，…，900。默认是取中间值500。</li>
+<li>primaryColor - Color类型，App主要部分的背景色（ToolBar,Tabbar等）</li>
+<li>primaryColorBrightness - Brightness类型，primaryColor的亮度，用于确定设置在primaryColor上部的文本和图标颜色(如:工具栏文本(toolbar text))。</li>
+<li>primaryColorLight - Color类型，primaryColor的较浅版本</li>
+<li>primaryColorDark - Color类型，primaryColor的较深版本</li>
+<li>accentColor - Color类型，前景色(按钮、文本、覆盖边缘效果等)</li>
+<li>accentColorBrightness - Brightness类型，accentColor的亮度。用于确定位于accentColor上部的文本和图标颜色(例如，浮动操作按钮(FloatingButton)上的图标)</li>
+<li>canvasColor - Color类型，MaterialType.canvas Material的默认颜色。</li>
+<li>scaffoldBackgroundColor - Color类型，作为Scaffold下的Material默认颜色，用于materia应用程序或app内页面的背景色。</li>
+<li>bottomAppBarColor - Color类型，bottomAppBarColor的默认颜色。这可以通过指定BottomAppBar.color来覆盖。</li>
+<li>cardColor - Color类型，用在卡片(Card)上的Material的颜色。</li>
+<li>dividerColor - Color类型，分隔符(Dividers)和弹窗分隔符(PopupMenuDividers)的颜色，也用于ListTiles和DataTables的行之间。要创建使用这种颜色的合适的边界，请考虑Divider.createBorderSide。</li>
+<li>highlightColor - Color类型，用于墨水喷溅动画或指示菜单被选中时的高亮颜色</li>
+<li>splashColor - Color类型，墨水溅出的颜色</li>
+<li>splashFactory - InteractiveInkFeatureFactory类型，定义InkWall和InkResponse产成的墨水喷溅时的外观。</li>
+<li>selectedRowColor - Color类型，用于高亮选定行的颜色。</li>
+<li>unselectedWidgetColor - Color类型，小部件处于非活动(但启用)状态时使用的颜色。例如，未选中的复选框。通常与accentColor形成对比。</li>
+<li>disabledColor - Color类型，无效的部件(widget)的颜色，不管它们的状态如何。例如，一个禁用的复选框(可以选中或不选中)。</li>
+<li>buttonColor - Color类型，Material中RaisedButtons使用的默认填充色。</li>
+<li>buttonTheme - ButtonThemeData类型，定义按钮小部件的默认配置，如RaisedButton和FlatButton。</li>
+<li>secondaryHeaderColor - Color类型，有选定行时PaginatedDataTable标题的颜色</li>
+<li>textSelectionColor - Color类型，文本字段(如TextField)中文本被选中的颜色。</li>
+<li>cursorColor - Color类型，在 Material-style 文本字段(如TextField)中光标的颜色。</li>
+<li>textSelectionHandleColor - Color类型，用于调整当前选定文本部分的句柄的颜色。</li>
+<li>backgroundColor - Color类型，与primaryColor对比的颜色(例如 用作进度条的剩余部分)。</li>
+<li>dialogBackgroundColor - Color类型，Color类型，Dialog元素的背景色</li>
+<li>indicatorColor - Color类型，TabBar中选项选中的指示器颜色。</li>
+<li>hintColor - Color类型，用于提示文本或占位符文本的颜色，例如在TextField中。</li>
+<li>errorColor - Color类型，用于输入验证错误的颜色，例如在TextField中。</li>
+<li>toggleableActiveColor - Color类型，用于突出显示切换Widget（如Switch，Radio和Checkbox）的活动状态的颜色。</li>
+<li>fontFamily - String类型，字体类型</li>
+<li>textTheme - TextTheme类型，与卡片和画布对比的文本颜色</li>
+<li>primaryTextTheme - TextTheme类型，与primary color形成对比的文本主题。</li>
+<li>accentTextTheme - TextTheme类型，与accent color形成对比的文本主题。</li>
+<li>inputDecorationTheme - InputDecorationTheme类型，InputDecorator、TextField和TextFormField的默认InputDecoration值基于此主题。</li>
+<li>iconTheme - IconThemeData类型，与卡片和画布颜色形成对比的图标主题。</li>
+<li>primaryIconTheme - IconThemeData类型，与原色(primary color)形成对比的图标主题。</li>
+<li>accentIconTheme - IconThemeData类型,与前景色(accent color)形成对比的图标主题。</li>
+<li>sliderTheme - SliderThemeData类型，SliderThemeData类型，用于渲染Slider的颜色和形状。</li>
+<li>tabBarTheme - TabBarTheme类型, 一个主题，用于自定义选项卡栏指示器的尺寸、形状和颜色。</li>
+<li>chipTheme - ChipThemeData类型,用于Chip的颜色和样式</li>
+<li>platform - TargetPlatform类型,widget应该适应目标的平台。</li>
+<li>materialTapTargetSize - MaterialTapTargetSize类型,配置特定材料部件的hit测试大小。</li>
+<li>pageTransitionsTheme - PageTransitionsTheme类型,每个目标平台的默认MaterialPageRoute转换。</li>
+<li>colorScheme - ColorScheme类型,一组13种颜色，可用于配置大多数组件的颜色属性。</li>
+<li>typography - Typography类型,用于配置TextTheme、primaryTextTheme和accentTextTheme的颜色和几何文本主题值。</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/03/24/Flutter-ThemeData-%E5%B1%9E%E6%80%A7%E5%90%AB%E4%B9%89/" data-id="ckcli33sn000k186n3hvn6qaq" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dart/" rel="tag">dart</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Android远程ADB配置" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/24/Android%E8%BF%9C%E7%A8%8BADB%E9%85%8D%E7%BD%AE/" class="article-date">
+  <time datetime="2020-03-24T01:48:15.000Z" itemprop="datePublished">2020-03-24</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Android/">Android</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/03/24/Android%E8%BF%9C%E7%A8%8BADB%E9%85%8D%E7%BD%AE/">Android远程ADB配置</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="非Root"><a href="#非Root" class="headerlink" title="非Root"></a>非Root</h1><p>非Root系统每次手机重启后需要插线ADB启动一下端口映射。<br><code>adb tcpip 5555</code></p>
+<p><code>5555</code> 是默认端口</p>
+<p>然后用 <code>adb connect 192.168.2.36</code><br>或指定端口 <code>adb connect 192.168.2.36:5555</code></p>
+<blockquote>
+<p>网络调试根据IP走，同理，如果你有公网IP就可以搞远程调试。</p>
+</blockquote>
+<h2 id="adb-快速查询IP"><a href="#adb-快速查询IP" class="headerlink" title="adb 快速查询IP"></a>adb 快速查询IP</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">adb shell ip addr show wlan0</span><br><span class="line"></span><br><span class="line">adb shell ip route</span><br><span class="line"></span><br><span class="line">adb shell ip neighbour</span><br></pre></td></tr></table></figure>
+<h1 id="有Root权限"><a href="#有Root权限" class="headerlink" title="有Root权限"></a>有Root权限</h1><p>可以使用Linux服务，把5555端口设置成服务。</p>
+<p>在Android的/system/build.prop文件最后添加service.adb.tcp.port=5555，重启后有效，需要root权限</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/03/24/Android%E8%BF%9C%E7%A8%8BADB%E9%85%8D%E7%BD%AE/" data-id="ckcli33si000b186ngveg2h6s" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%BD%AF%E4%BB%B6/" rel="tag">软件</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-面向对象设计原则的一点理解。" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/21/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99%E7%9A%84%E4%B8%80%E7%82%B9%E7%90%86%E8%A7%A3%E3%80%82/" class="article-date">
+  <time datetime="2020-03-21T09:25:22.000Z" itemprop="datePublished">2020-03-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%8E%9F%E7%90%86%E4%B8%8E%E5%9F%BA%E7%A1%80/">原理与基础</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/03/21/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99%E7%9A%84%E4%B8%80%E7%82%B9%E7%90%86%E8%A7%A3%E3%80%82/">面向对象设计原则的一点理解。</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="面向对象设计原则（Object-Oriented-Design-Principles）"><a href="#面向对象设计原则（Object-Oriented-Design-Principles）" class="headerlink" title="面向对象设计原则（Object Oriented Design Principles）"></a>面向对象设计原则（Object Oriented Design Principles）</h1><h2 id="原则一：开闭原则（Open-Close-Principle）"><a href="#原则一：开闭原则（Open-Close-Principle）" class="headerlink" title="原则一：开闭原则（Open Close Principle）"></a>原则一：开闭原则（Open Close Principle）</h2><blockquote>
+<p>对父类的锁定</p>
+</blockquote>
+<p>假设，快餐店有经典汉堡套餐。快餐店需要搞促销，赠送一份礼物</p>
+<p>垃圾做法： 经典汉堡套餐+送1，送2，送3。</p>
+<blockquote>
+<p>正确： 经典套餐1 = 经典汉堡套餐+送1<br>结果： 经典套餐1满足父类的要求，并且没有冗余的“送2”，“送3”</p>
+</blockquote>
+<h2 id="原则二：单一职责原则（Single-Responsibility-Principle）"><a href="#原则二：单一职责原则（Single-Responsibility-Principle）" class="headerlink" title="原则二：单一职责原则（Single Responsibility Principle）"></a>原则二：单一职责原则（Single Responsibility Principle）</h2><blockquote>
+<p>设计角度，一个类只允许有一个职责、与类耦合性不高的业务，接口实现。</p>
+</blockquote>
+<p>工人本职只有搬砖一项工作，现在需要工人计算他的工资；</p>
+<p>垃圾做法： 工人增加计算工资方法。</p>
+<p>问题点，计算工资不是工人的工作范畴。</p>
+<blockquote>
+<p>正确： 增加财务接口，工人实现财务接口，增加计算工资方法。<br>结果： 员工本身职责未变，非本职工作可以完成</p>
+</blockquote>
+<h2 id="原则三：依赖倒置原则（Dependency-Inversion-Principle）"><a href="#原则三：依赖倒置原则（Dependency-Inversion-Principle）" class="headerlink" title="原则三：依赖倒置原则（Dependency Inversion Principle）"></a>原则三：依赖倒置原则（Dependency Inversion Principle）</h2><blockquote>
+<p>审视依赖，抽象依赖为事件</p>
+</blockquote>
+<p>经理对各部门主管下达任务。各主管完成任务类似、但又不尽相同。</p>
+<p>垃圾做法： 实例多个主管、安排每一个主管的任务。</p>
+<blockquote>
+<p>正确： 将任务设计为接口、主管增加任务的方式实现，经理只关注任务结果即可。<br>结果： 经理不依赖主管，只关注任务。</p>
+</blockquote>
+<h2 id="原则四：接口分离原则（Interface-Segregation-Principle）"><a href="#原则四：接口分离原则（Interface-Segregation-Principle）" class="headerlink" title="原则四：接口分离原则（Interface Segregation Principle）"></a>原则四：接口分离原则（Interface Segregation Principle）</h2><blockquote>
+<p>是对业务的梳理，事件的分离，对事件的分离</p>
+</blockquote>
+<p>多个参与方、执行方、连续步骤的业务情况下。例如公司的运行。</p>
+<p>垃圾做法： 将所有业务都归纳为一个大型操作手册（接口）。每个职员入职后去查看其需要的部分，他可能只需要用到很少的事情。</p>
+<blockquote>
+<p>正确： 拆分大型操作手册（接口），每个实例实现自己需要的一个或多个接口<br>结果： 单一实例本身处理业务清晰可见，屏蔽与他无关的业务带来的干扰。</p>
+</blockquote>
+<h2 id="原则五：迪米特法则（Law-of-Demeter）"><a href="#原则五：迪米特法则（Law-of-Demeter）" class="headerlink" title="原则五：迪米特法则（Law of Demeter）"></a>原则五：迪米特法则（Law of Demeter）</h2><blockquote>
+<p>从属关系问题，目标是依赖减少，</p>
+</blockquote>
+<p>例如：经理、主管、职员。经理需要打印文件。</p>
+<p>垃圾写法： 经理调用主管，主管调用职员，职员打印。</p>
+<blockquote>
+<p>正确： 主管应当封装方法，经理只能调用主管方法完成打印。<br>结果： 经理方只依赖主管一方，依赖减少</p>
+</blockquote>
+<h2 id="原则六：里氏替换原则（Liskov-Substitution-Principle）"><a href="#原则六：里氏替换原则（Liskov-Substitution-Principle）" class="headerlink" title="原则六：里氏替换原则（Liskov Substitution Principle）"></a>原则六：里氏替换原则（Liskov Substitution Principle）</h2><blockquote>
+<p>真正合理的继承方式</p>
+</blockquote>
+<p>卡车、跑车都能<strong>载人</strong>，但是<strong>速度</strong>不一样，<strong>体积</strong>不一样。</p>
+<p>垃圾写法：卡车继承跑车，修改<strong>速度</strong>、<strong>体积</strong>，共用<strong>载人</strong>抵达目的地</p>
+<blockquote>
+<p>正确： 增加<strong>机动车</strong>类型，速度、体积归属机动车类型，载人是机动车基本方法。卡车、跑车继承机动车。实际操作中可将各种派生车型，统一递归其载人方法。<br>结果： 使用者可以直接调用载人方法。无需关心车型。对使用者减少了迷惑与语意增加。一种真正合理的继承方式。</p>
+</blockquote>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/03/21/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99%E7%9A%84%E4%B8%80%E7%82%B9%E7%90%86%E8%A7%A3%E3%80%82/" data-id="ckcli33ti0030186nhntt1suq" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%BD%AF%E4%BB%B6/" rel="tag">软件</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/">&amp;laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/3/">Next &amp;raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/">其他技能</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/">Flutter</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/Android/">Android</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/iOS/">iOS</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/">其他技能</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/Flutter/">Flutter</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%8E%9F%E7%90%86%E4%B8%8E%E5%9F%BA%E7%A1%80/">原理与基础</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dart/" rel="tag">dart</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/" rel="tag">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/" rel="tag">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kotlin/" rel="tag">kotlin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/net/" rel="tag">net</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/swift/" rel="tag">swift</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BD%AF%E4%BB%B6/" rel="tag">软件</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/c/" style="font-size: 17.5px;">c++</a> <a href="/tags/dart/" style="font-size: 20px;">dart</a> <a href="/tags/go/" style="font-size: 10px;">go</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/kotlin/" style="font-size: 12.5px;">kotlin</a> <a href="/tags/net/" style="font-size: 10px;">net</a> <a href="/tags/swift/" style="font-size: 12.5px;">swift</a> <a href="/tags/%E8%BD%AF%E4%BB%B6/" style="font-size: 15px;">软件</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/07/14/Github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2/">使用Github搭建博客</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/11/Dart-%E7%BC%96%E8%AF%91%E3%80%81%E5%90%AF%E5%8A%A8%E6%9C%8D%E5%8A%A1%E3%80%81%E5%92%8C%E6%B5%8B%E8%AF%95-web-%E5%BA%94%E7%94%A8%E7%9A%84-build-runner/">Dart 编译、启动服务、和测试 web 应用的 build_runner</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/07/LaTex-%E9%80%9F%E6%88%90%E6%89%8B%E5%86%8C/">LaTex 速成手册。</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/01/Dart-%E6%B3%A8%E8%A7%A3%EF%BC%8CAPT/">Dart 注解，APT</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/30/Flutter-%E5%8A%A8%E7%94%BB%E8%80%83%E7%A9%B6/">Flutter 动画考究</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 Kevin 刘洋<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

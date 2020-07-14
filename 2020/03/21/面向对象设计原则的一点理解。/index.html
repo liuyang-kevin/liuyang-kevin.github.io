@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>面向对象设计原则的一点理解。 | Kevin Liu 的简单博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="面向对象设计原则（Object Oriented Design Principles）原则一：开闭原则（Open Close Principle） 对父类的锁定  假设，快餐店有经典汉堡套餐。快餐店需要搞促销，赠送一份礼物 垃圾做法： 经典汉堡套餐+送1，送2，送3。  正确： 经典套餐1 &#x3D; 经典汉堡套餐+送1结果： 经典套餐1满足父类的要求，并且没有冗余的“送2”，“送3”  原则二：单一职责">
+<meta property="og:type" content="article">
+<meta property="og:title" content="面向对象设计原则的一点理解。">
+<meta property="og:url" content="http://yoursite.com/2020/03/21/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99%E7%9A%84%E4%B8%80%E7%82%B9%E7%90%86%E8%A7%A3%E3%80%82/index.html">
+<meta property="og:site_name" content="Kevin Liu 的简单博客">
+<meta property="og:description" content="面向对象设计原则（Object Oriented Design Principles）原则一：开闭原则（Open Close Principle） 对父类的锁定  假设，快餐店有经典汉堡套餐。快餐店需要搞促销，赠送一份礼物 垃圾做法： 经典汉堡套餐+送1，送2，送3。  正确： 经典套餐1 &#x3D; 经典汉堡套餐+送1结果： 经典套餐1满足父类的要求，并且没有冗余的“送2”，“送3”  原则二：单一职责">
+<meta property="og:locale" content="zh">
+<meta property="article:published_time" content="2020-03-21T09:25:22.000Z">
+<meta property="article:modified_time" content="2020-07-14T04:37:13.095Z">
+<meta property="article:author" content="Kevin 刘洋">
+<meta property="article:tag" content="软件">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Kevin Liu 的简单博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Kevin Liu 的简单博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">全干工程师</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-面向对象设计原则的一点理解。" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/21/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99%E7%9A%84%E4%B8%80%E7%82%B9%E7%90%86%E8%A7%A3%E3%80%82/" class="article-date">
+  <time datetime="2020-03-21T09:25:22.000Z" itemprop="datePublished">2020-03-21</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%8E%9F%E7%90%86%E4%B8%8E%E5%9F%BA%E7%A1%80/">原理与基础</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      面向对象设计原则的一点理解。
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="面向对象设计原则（Object-Oriented-Design-Principles）"><a href="#面向对象设计原则（Object-Oriented-Design-Principles）" class="headerlink" title="面向对象设计原则（Object Oriented Design Principles）"></a>面向对象设计原则（Object Oriented Design Principles）</h1><h2 id="原则一：开闭原则（Open-Close-Principle）"><a href="#原则一：开闭原则（Open-Close-Principle）" class="headerlink" title="原则一：开闭原则（Open Close Principle）"></a>原则一：开闭原则（Open Close Principle）</h2><blockquote>
+<p>对父类的锁定</p>
+</blockquote>
+<p>假设，快餐店有经典汉堡套餐。快餐店需要搞促销，赠送一份礼物</p>
+<p>垃圾做法： 经典汉堡套餐+送1，送2，送3。</p>
+<blockquote>
+<p>正确： 经典套餐1 = 经典汉堡套餐+送1<br>结果： 经典套餐1满足父类的要求，并且没有冗余的“送2”，“送3”</p>
+</blockquote>
+<h2 id="原则二：单一职责原则（Single-Responsibility-Principle）"><a href="#原则二：单一职责原则（Single-Responsibility-Principle）" class="headerlink" title="原则二：单一职责原则（Single Responsibility Principle）"></a>原则二：单一职责原则（Single Responsibility Principle）</h2><blockquote>
+<p>设计角度，一个类只允许有一个职责、与类耦合性不高的业务，接口实现。</p>
+</blockquote>
+<p>工人本职只有搬砖一项工作，现在需要工人计算他的工资；</p>
+<p>垃圾做法： 工人增加计算工资方法。</p>
+<p>问题点，计算工资不是工人的工作范畴。</p>
+<blockquote>
+<p>正确： 增加财务接口，工人实现财务接口，增加计算工资方法。<br>结果： 员工本身职责未变，非本职工作可以完成</p>
+</blockquote>
+<h2 id="原则三：依赖倒置原则（Dependency-Inversion-Principle）"><a href="#原则三：依赖倒置原则（Dependency-Inversion-Principle）" class="headerlink" title="原则三：依赖倒置原则（Dependency Inversion Principle）"></a>原则三：依赖倒置原则（Dependency Inversion Principle）</h2><blockquote>
+<p>审视依赖，抽象依赖为事件</p>
+</blockquote>
+<p>经理对各部门主管下达任务。各主管完成任务类似、但又不尽相同。</p>
+<p>垃圾做法： 实例多个主管、安排每一个主管的任务。</p>
+<blockquote>
+<p>正确： 将任务设计为接口、主管增加任务的方式实现，经理只关注任务结果即可。<br>结果： 经理不依赖主管，只关注任务。</p>
+</blockquote>
+<h2 id="原则四：接口分离原则（Interface-Segregation-Principle）"><a href="#原则四：接口分离原则（Interface-Segregation-Principle）" class="headerlink" title="原则四：接口分离原则（Interface Segregation Principle）"></a>原则四：接口分离原则（Interface Segregation Principle）</h2><blockquote>
+<p>是对业务的梳理，事件的分离，对事件的分离</p>
+</blockquote>
+<p>多个参与方、执行方、连续步骤的业务情况下。例如公司的运行。</p>
+<p>垃圾做法： 将所有业务都归纳为一个大型操作手册（接口）。每个职员入职后去查看其需要的部分，他可能只需要用到很少的事情。</p>
+<blockquote>
+<p>正确： 拆分大型操作手册（接口），每个实例实现自己需要的一个或多个接口<br>结果： 单一实例本身处理业务清晰可见，屏蔽与他无关的业务带来的干扰。</p>
+</blockquote>
+<h2 id="原则五：迪米特法则（Law-of-Demeter）"><a href="#原则五：迪米特法则（Law-of-Demeter）" class="headerlink" title="原则五：迪米特法则（Law of Demeter）"></a>原则五：迪米特法则（Law of Demeter）</h2><blockquote>
+<p>从属关系问题，目标是依赖减少，</p>
+</blockquote>
+<p>例如：经理、主管、职员。经理需要打印文件。</p>
+<p>垃圾写法： 经理调用主管，主管调用职员，职员打印。</p>
+<blockquote>
+<p>正确： 主管应当封装方法，经理只能调用主管方法完成打印。<br>结果： 经理方只依赖主管一方，依赖减少</p>
+</blockquote>
+<h2 id="原则六：里氏替换原则（Liskov-Substitution-Principle）"><a href="#原则六：里氏替换原则（Liskov-Substitution-Principle）" class="headerlink" title="原则六：里氏替换原则（Liskov Substitution Principle）"></a>原则六：里氏替换原则（Liskov Substitution Principle）</h2><blockquote>
+<p>真正合理的继承方式</p>
+</blockquote>
+<p>卡车、跑车都能<strong>载人</strong>，但是<strong>速度</strong>不一样，<strong>体积</strong>不一样。</p>
+<p>垃圾写法：卡车继承跑车，修改<strong>速度</strong>、<strong>体积</strong>，共用<strong>载人</strong>抵达目的地</p>
+<blockquote>
+<p>正确： 增加<strong>机动车</strong>类型，速度、体积归属机动车类型，载人是机动车基本方法。卡车、跑车继承机动车。实际操作中可将各种派生车型，统一递归其载人方法。<br>结果： 使用者可以直接调用载人方法。无需关心车型。对使用者减少了迷惑与语意增加。一种真正合理的继承方式。</p>
+</blockquote>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/03/21/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99%E7%9A%84%E4%B8%80%E7%82%B9%E7%90%86%E8%A7%A3%E3%80%82/" data-id="ckcli33ti0030186nhntt1suq" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%BD%AF%E4%BB%B6/" rel="tag">软件</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/03/24/Android%E8%BF%9C%E7%A8%8BADB%E9%85%8D%E7%BD%AE/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Android远程ADB配置
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/03/21/%E9%9F%B3%E9%A2%91%E5%8F%AF%E8%A7%86%E5%8C%96/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">音频可视化</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/">其他技能</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/">Flutter</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/Android/">Android</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/iOS/">iOS</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/">其他技能</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/Flutter/">Flutter</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%8E%9F%E7%90%86%E4%B8%8E%E5%9F%BA%E7%A1%80/">原理与基础</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dart/" rel="tag">dart</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/" rel="tag">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/" rel="tag">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kotlin/" rel="tag">kotlin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/net/" rel="tag">net</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/swift/" rel="tag">swift</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BD%AF%E4%BB%B6/" rel="tag">软件</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/c/" style="font-size: 17.5px;">c++</a> <a href="/tags/dart/" style="font-size: 20px;">dart</a> <a href="/tags/go/" style="font-size: 10px;">go</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/kotlin/" style="font-size: 12.5px;">kotlin</a> <a href="/tags/net/" style="font-size: 10px;">net</a> <a href="/tags/swift/" style="font-size: 12.5px;">swift</a> <a href="/tags/%E8%BD%AF%E4%BB%B6/" style="font-size: 15px;">软件</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/07/14/Github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2/">使用Github搭建博客</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/11/Dart-%E7%BC%96%E8%AF%91%E3%80%81%E5%90%AF%E5%8A%A8%E6%9C%8D%E5%8A%A1%E3%80%81%E5%92%8C%E6%B5%8B%E8%AF%95-web-%E5%BA%94%E7%94%A8%E7%9A%84-build-runner/">Dart 编译、启动服务、和测试 web 应用的 build_runner</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/07/LaTex-%E9%80%9F%E6%88%90%E6%89%8B%E5%86%8C/">LaTex 速成手册。</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/01/Dart-%E6%B3%A8%E8%A7%A3%EF%BC%8CAPT/">Dart 注解，APT</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/30/Flutter-%E5%8A%A8%E7%94%BB%E8%80%83%E7%A9%B6/">Flutter 动画考究</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 Kevin 刘洋<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

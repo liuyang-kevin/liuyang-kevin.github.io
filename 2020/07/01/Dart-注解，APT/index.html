@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Dart 注解，APT | Kevin Liu 的简单博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="对于注解，初级开发者大都不需要关注，多半是自动代码生成中发现了，随之就忽略了。总觉得没啥用，这事儿不归我管。这种东西，多半还是开发过程中，遇到了效率瓶颈，程序员才会想起来的东西。关键点是，你需要它的时候，你不一定能想起来它是谁。 OK，进入主题 APT(Annotation Processing Tool)即注解处理器 APT：它是一种工具，处理注解, 简单来说就是在编译期，通过注解生成新的文件或">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dart 注解，APT">
+<meta property="og:url" content="http://yoursite.com/2020/07/01/Dart-%E6%B3%A8%E8%A7%A3%EF%BC%8CAPT/index.html">
+<meta property="og:site_name" content="Kevin Liu 的简单博客">
+<meta property="og:description" content="对于注解，初级开发者大都不需要关注，多半是自动代码生成中发现了，随之就忽略了。总觉得没啥用，这事儿不归我管。这种东西，多半还是开发过程中，遇到了效率瓶颈，程序员才会想起来的东西。关键点是，你需要它的时候，你不一定能想起来它是谁。 OK，进入主题 APT(Annotation Processing Tool)即注解处理器 APT：它是一种工具，处理注解, 简单来说就是在编译期，通过注解生成新的文件或">
+<meta property="og:locale" content="zh">
+<meta property="article:published_time" content="2020-07-01T06:10:19.000Z">
+<meta property="article:modified_time" content="2020-07-14T04:37:13.086Z">
+<meta property="article:author" content="Kevin 刘洋">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Kevin Liu 的简单博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Kevin Liu 的简单博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">全干工程师</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Dart-注解，APT" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/07/01/Dart-%E6%B3%A8%E8%A7%A3%EF%BC%8CAPT/" class="article-date">
+  <time datetime="2020-07-01T06:10:19.000Z" itemprop="datePublished">2020-07-01</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Dart 注解，APT
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>对于注解，初级开发者大都不需要关注，多半是自动代码生成中发现了，随之就忽略了。总觉得没啥用，这事儿不归我管。这种东西，多半还是开发过程中，遇到了效率瓶颈，程序员才会想起来的东西。关键点是，你需要它的时候，你不一定能想起来它是谁。</p>
+<p>OK，进入主题</p>
+<h1 id="APT-Annotation-Processing-Tool-即注解处理器"><a href="#APT-Annotation-Processing-Tool-即注解处理器" class="headerlink" title="APT(Annotation Processing Tool)即注解处理器"></a>APT(Annotation Processing Tool)即注解处理器</h1><blockquote>
+<p>APT：它是一种工具，处理注解, 简单来说就是在编译期，通过注解生成新的文件或者代码。</p>
+</blockquote>
+<p>使用APT的优点就是方便、简单，可以少些很多重复的代码。Android、Java里我们最常见的@就是这个。Python里有装饰器。不严谨的来说，C里的宏也算这个东西。就是为了提升效率，减少重复代码。</p>
+<p>Flutter，其实也就是Dart的注解处理依赖于 <a href="https://github.com/dart-lang/source_gen" target="_blank" rel="noopener">source_gen</a>。它的详细资料可以在它的 Github 主页查看，这里我们不做过多展开，你只需要知道[Dart-APT Powered by <a href="https://github.com/dart-lang/source_gen" target="_blank" rel="noopener">source_gen</a>]</p>
+<h1 id="A-Dart-Demo"><a href="#A-Dart-Demo" class="headerlink" title="A Dart Demo"></a>A Dart Demo</h1><ol start="0">
+<li>新建demo项目。</li>
+<li>依赖 source_gen</li>
+</ol>
+<h2 id="依赖-source-gen"><a href="#依赖-source-gen" class="headerlink" title="依赖 source_gen"></a>依赖 source_gen</h2>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/07/01/Dart-%E6%B3%A8%E8%A7%A3%EF%BC%8CAPT/" data-id="ckcli33sk000d186ncxgg5ltl" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/07/07/LaTex-%E9%80%9F%E6%88%90%E6%89%8B%E5%86%8C/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          LaTex 速成手册。
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/06/30/Flutter-%E5%8A%A8%E7%94%BB%E8%80%83%E7%A9%B6/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Flutter 动画考究</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/">其他技能</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/">Flutter</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/Android/">Android</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/iOS/">iOS</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/">其他技能</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/Flutter/">Flutter</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%8E%9F%E7%90%86%E4%B8%8E%E5%9F%BA%E7%A1%80/">原理与基础</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dart/" rel="tag">dart</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/" rel="tag">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/" rel="tag">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kotlin/" rel="tag">kotlin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/net/" rel="tag">net</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/swift/" rel="tag">swift</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BD%AF%E4%BB%B6/" rel="tag">软件</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/c/" style="font-size: 17.5px;">c++</a> <a href="/tags/dart/" style="font-size: 20px;">dart</a> <a href="/tags/go/" style="font-size: 10px;">go</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/kotlin/" style="font-size: 12.5px;">kotlin</a> <a href="/tags/net/" style="font-size: 10px;">net</a> <a href="/tags/swift/" style="font-size: 12.5px;">swift</a> <a href="/tags/%E8%BD%AF%E4%BB%B6/" style="font-size: 15px;">软件</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/07/14/Github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2/">使用Github搭建博客</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/11/Dart-%E7%BC%96%E8%AF%91%E3%80%81%E5%90%AF%E5%8A%A8%E6%9C%8D%E5%8A%A1%E3%80%81%E5%92%8C%E6%B5%8B%E8%AF%95-web-%E5%BA%94%E7%94%A8%E7%9A%84-build-runner/">Dart 编译、启动服务、和测试 web 应用的 build_runner</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/07/LaTex-%E9%80%9F%E6%88%90%E6%89%8B%E5%86%8C/">LaTex 速成手册。</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/01/Dart-%E6%B3%A8%E8%A7%A3%EF%BC%8CAPT/">Dart 注解，APT</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/30/Flutter-%E5%8A%A8%E7%94%BB%E8%80%83%E7%A9%B6/">Flutter 动画考究</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 Kevin 刘洋<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Flutter ThemeData 属性含义 | Kevin Liu 的简单博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="brightness - Brightness类型，应用程序的整体主题亮度。用于按钮等小部件，以确定在不使用主色（primaryColor）或强调色（accentColor）时选择什么颜色。当亮度较暗时，画布、卡片和原色都较暗。当亮度为光时，画布和卡片的颜色是明亮的，原色的暗度根据原色亮度变化。当亮度较暗时，原色（primaryColor）与卡片和画布颜色的对比度较差;当亮度较暗时，用白色或亮蓝">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Flutter ThemeData 属性含义">
+<meta property="og:url" content="http://yoursite.com/2020/03/24/Flutter-ThemeData-%E5%B1%9E%E6%80%A7%E5%90%AB%E4%B9%89/index.html">
+<meta property="og:site_name" content="Kevin Liu 的简单博客">
+<meta property="og:description" content="brightness - Brightness类型，应用程序的整体主题亮度。用于按钮等小部件，以确定在不使用主色（primaryColor）或强调色（accentColor）时选择什么颜色。当亮度较暗时，画布、卡片和原色都较暗。当亮度为光时，画布和卡片的颜色是明亮的，原色的暗度根据原色亮度变化。当亮度较暗时，原色（primaryColor）与卡片和画布颜色的对比度较差;当亮度较暗时，用白色或亮蓝">
+<meta property="og:locale" content="zh">
+<meta property="article:published_time" content="2020-03-24T07:45:17.000Z">
+<meta property="article:modified_time" content="2020-07-14T04:37:13.088Z">
+<meta property="article:author" content="Kevin 刘洋">
+<meta property="article:tag" content="dart">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Kevin Liu 的简单博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Kevin Liu 的简单博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">全干工程师</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Flutter-ThemeData-属性含义" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/03/24/Flutter-ThemeData-%E5%B1%9E%E6%80%A7%E5%90%AB%E4%B9%89/" class="article-date">
+  <time datetime="2020-03-24T07:45:17.000Z" itemprop="datePublished">2020-03-24</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Flutter/">Flutter</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Flutter ThemeData 属性含义
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <ul>
+<li>brightness - Brightness类型，应用程序的整体主题亮度。用于按钮等小部件，以确定在不使用主色（primaryColor）或强调色（accentColor）时选择什么颜色。当亮度较暗时，画布、卡片和原色都较暗。当亮度为光时，画布和卡片的颜色是明亮的，原色的暗度根据原色亮度变化。当亮度较暗时，原色（primaryColor）与卡片和画布颜色的对比度较差;当亮度较暗时，用白色或亮蓝色来对比。</li>
+<li>primarySwatch - MaterialColor 类型，Material 主题中定义一种颜色，它具有十种颜色阴影的颜色样本。值越大颜色越深，10个有效的index分别为：50，100，200，…，900。默认是取中间值500。</li>
+<li>primaryColor - Color类型，App主要部分的背景色（ToolBar,Tabbar等）</li>
+<li>primaryColorBrightness - Brightness类型，primaryColor的亮度，用于确定设置在primaryColor上部的文本和图标颜色(如:工具栏文本(toolbar text))。</li>
+<li>primaryColorLight - Color类型，primaryColor的较浅版本</li>
+<li>primaryColorDark - Color类型，primaryColor的较深版本</li>
+<li>accentColor - Color类型，前景色(按钮、文本、覆盖边缘效果等)</li>
+<li>accentColorBrightness - Brightness类型，accentColor的亮度。用于确定位于accentColor上部的文本和图标颜色(例如，浮动操作按钮(FloatingButton)上的图标)</li>
+<li>canvasColor - Color类型，MaterialType.canvas Material的默认颜色。</li>
+<li>scaffoldBackgroundColor - Color类型，作为Scaffold下的Material默认颜色，用于materia应用程序或app内页面的背景色。</li>
+<li>bottomAppBarColor - Color类型，bottomAppBarColor的默认颜色。这可以通过指定BottomAppBar.color来覆盖。</li>
+<li>cardColor - Color类型，用在卡片(Card)上的Material的颜色。</li>
+<li>dividerColor - Color类型，分隔符(Dividers)和弹窗分隔符(PopupMenuDividers)的颜色，也用于ListTiles和DataTables的行之间。要创建使用这种颜色的合适的边界，请考虑Divider.createBorderSide。</li>
+<li>highlightColor - Color类型，用于墨水喷溅动画或指示菜单被选中时的高亮颜色</li>
+<li>splashColor - Color类型，墨水溅出的颜色</li>
+<li>splashFactory - InteractiveInkFeatureFactory类型，定义InkWall和InkResponse产成的墨水喷溅时的外观。</li>
+<li>selectedRowColor - Color类型，用于高亮选定行的颜色。</li>
+<li>unselectedWidgetColor - Color类型，小部件处于非活动(但启用)状态时使用的颜色。例如，未选中的复选框。通常与accentColor形成对比。</li>
+<li>disabledColor - Color类型，无效的部件(widget)的颜色，不管它们的状态如何。例如，一个禁用的复选框(可以选中或不选中)。</li>
+<li>buttonColor - Color类型，Material中RaisedButtons使用的默认填充色。</li>
+<li>buttonTheme - ButtonThemeData类型，定义按钮小部件的默认配置，如RaisedButton和FlatButton。</li>
+<li>secondaryHeaderColor - Color类型，有选定行时PaginatedDataTable标题的颜色</li>
+<li>textSelectionColor - Color类型，文本字段(如TextField)中文本被选中的颜色。</li>
+<li>cursorColor - Color类型，在 Material-style 文本字段(如TextField)中光标的颜色。</li>
+<li>textSelectionHandleColor - Color类型，用于调整当前选定文本部分的句柄的颜色。</li>
+<li>backgroundColor - Color类型，与primaryColor对比的颜色(例如 用作进度条的剩余部分)。</li>
+<li>dialogBackgroundColor - Color类型，Color类型，Dialog元素的背景色</li>
+<li>indicatorColor - Color类型，TabBar中选项选中的指示器颜色。</li>
+<li>hintColor - Color类型，用于提示文本或占位符文本的颜色，例如在TextField中。</li>
+<li>errorColor - Color类型，用于输入验证错误的颜色，例如在TextField中。</li>
+<li>toggleableActiveColor - Color类型，用于突出显示切换Widget（如Switch，Radio和Checkbox）的活动状态的颜色。</li>
+<li>fontFamily - String类型，字体类型</li>
+<li>textTheme - TextTheme类型，与卡片和画布对比的文本颜色</li>
+<li>primaryTextTheme - TextTheme类型，与primary color形成对比的文本主题。</li>
+<li>accentTextTheme - TextTheme类型，与accent color形成对比的文本主题。</li>
+<li>inputDecorationTheme - InputDecorationTheme类型，InputDecorator、TextField和TextFormField的默认InputDecoration值基于此主题。</li>
+<li>iconTheme - IconThemeData类型，与卡片和画布颜色形成对比的图标主题。</li>
+<li>primaryIconTheme - IconThemeData类型，与原色(primary color)形成对比的图标主题。</li>
+<li>accentIconTheme - IconThemeData类型,与前景色(accent color)形成对比的图标主题。</li>
+<li>sliderTheme - SliderThemeData类型，SliderThemeData类型，用于渲染Slider的颜色和形状。</li>
+<li>tabBarTheme - TabBarTheme类型, 一个主题，用于自定义选项卡栏指示器的尺寸、形状和颜色。</li>
+<li>chipTheme - ChipThemeData类型,用于Chip的颜色和样式</li>
+<li>platform - TargetPlatform类型,widget应该适应目标的平台。</li>
+<li>materialTapTargetSize - MaterialTapTargetSize类型,配置特定材料部件的hit测试大小。</li>
+<li>pageTransitionsTheme - PageTransitionsTheme类型,每个目标平台的默认MaterialPageRoute转换。</li>
+<li>colorScheme - ColorScheme类型,一组13种颜色，可用于配置大多数组件的颜色属性。</li>
+<li>typography - Typography类型,用于配置TextTheme、primaryTextTheme和accentTextTheme的颜色和几何文本主题值。</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/03/24/Flutter-ThemeData-%E5%B1%9E%E6%80%A7%E5%90%AB%E4%B9%89/" data-id="ckcli33sn000k186n3hvn6qaq" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dart/" rel="tag">dart</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/03/28/%E7%AC%AC%E4%BA%94%E7%BB%B4%E5%BA%A6%E4%BB%A3%E7%A0%81%E8%A7%84%E8%8C%83/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          第五维度代码规范
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/03/24/Android%E8%BF%9C%E7%A8%8BADB%E9%85%8D%E7%BD%AE/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Android远程ADB配置</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/">其他技能</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/">Flutter</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/Android/">Android</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/iOS/">iOS</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/">其他技能</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/Flutter/">Flutter</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%8E%9F%E7%90%86%E4%B8%8E%E5%9F%BA%E7%A1%80/">原理与基础</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dart/" rel="tag">dart</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/" rel="tag">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/" rel="tag">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kotlin/" rel="tag">kotlin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/net/" rel="tag">net</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/swift/" rel="tag">swift</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BD%AF%E4%BB%B6/" rel="tag">软件</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/c/" style="font-size: 17.5px;">c++</a> <a href="/tags/dart/" style="font-size: 20px;">dart</a> <a href="/tags/go/" style="font-size: 10px;">go</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/kotlin/" style="font-size: 12.5px;">kotlin</a> <a href="/tags/net/" style="font-size: 10px;">net</a> <a href="/tags/swift/" style="font-size: 12.5px;">swift</a> <a href="/tags/%E8%BD%AF%E4%BB%B6/" style="font-size: 15px;">软件</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/07/14/Github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2/">使用Github搭建博客</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/11/Dart-%E7%BC%96%E8%AF%91%E3%80%81%E5%90%AF%E5%8A%A8%E6%9C%8D%E5%8A%A1%E3%80%81%E5%92%8C%E6%B5%8B%E8%AF%95-web-%E5%BA%94%E7%94%A8%E7%9A%84-build-runner/">Dart 编译、启动服务、和测试 web 应用的 build_runner</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/07/LaTex-%E9%80%9F%E6%88%90%E6%89%8B%E5%86%8C/">LaTex 速成手册。</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/01/Dart-%E6%B3%A8%E8%A7%A3%EF%BC%8CAPT/">Dart 注解，APT</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/30/Flutter-%E5%8A%A8%E7%94%BB%E8%80%83%E7%A9%B6/">Flutter 动画考究</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 Kevin 刘洋<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

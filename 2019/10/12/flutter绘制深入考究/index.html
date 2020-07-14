@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>flutter绘制深入考究 | Kevin Liu 的简单博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Flutter渲染框架">
+<meta property="og:type" content="article">
+<meta property="og:title" content="flutter绘制深入考究">
+<meta property="og:url" content="http://yoursite.com/2019/10/12/flutter%E7%BB%98%E5%88%B6%E6%B7%B1%E5%85%A5%E8%80%83%E7%A9%B6/index.html">
+<meta property="og:site_name" content="Kevin Liu 的简单博客">
+<meta property="og:description" content="Flutter渲染框架">
+<meta property="og:locale" content="zh">
+<meta property="og:image" content="http://yoursite.com/2019/10/12/flutter%E7%BB%98%E5%88%B6%E6%B7%B1%E5%85%A5%E8%80%83%E7%A9%B6/flutter%E7%BB%98%E5%88%B6%E6%B7%B1%E5%85%A5%E8%80%83%E7%A9%B6/flutter_layer.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/10/12/flutter%E7%BB%98%E5%88%B6%E6%B7%B1%E5%85%A5%E8%80%83%E7%A9%B6/flutter_layer.jpg">
+<meta property="article:published_time" content="2019-10-12T06:32:53.000Z">
+<meta property="article:modified_time" content="2020-07-14T04:37:13.092Z">
+<meta property="article:author" content="Kevin 刘洋">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2019/10/12/flutter%E7%BB%98%E5%88%B6%E6%B7%B1%E5%85%A5%E8%80%83%E7%A9%B6/flutter%E7%BB%98%E5%88%B6%E6%B7%B1%E5%85%A5%E8%80%83%E7%A9%B6/flutter_layer.jpg">
+  
+    <link rel="alternate" href="/atom.xml" title="Kevin Liu 的简单博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Kevin Liu 的简单博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">全干工程师</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-flutter绘制深入考究" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/10/12/flutter%E7%BB%98%E5%88%B6%E6%B7%B1%E5%85%A5%E8%80%83%E7%A9%B6/" class="article-date">
+  <time datetime="2019-10-12T06:32:53.000Z" itemprop="datePublished">2019-10-12</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Flutter/">Flutter</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      flutter绘制深入考究
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Flutter渲染框架"><a href="#Flutter渲染框架" class="headerlink" title="Flutter渲染框架"></a>Flutter渲染框架</h1><p><img src="./flutter%E7%BB%98%E5%88%B6%E6%B7%B1%E5%85%A5%E8%80%83%E7%A9%B6/flutter_layer.jpg" alt=""><br><img src="./flutter_layer.jpg" alt=""></p>
+<a id="more"></a>
+
+<ol>
+<li><p>Layer Tree：<br> 这个是dart runtime输出的一个树状数据结构，树上的每一个叶子节点，代表了一个界面元素（Button，Image等等）。</p>
+</li>
+<li><p>Skia：<br> 这个是谷歌的一个跨平台渲染框架，从目前IOS和anrdroid来看，SKIA底层最终都是调用OpenGL绘制。Vulkan支持还不太好，Metal还不支持。</p>
+</li>
+<li><p>Shell：<br> 这里的Shell特指平台特性（Platform）的那一部分，包含IOS和Android平台相关的实现，包括EAGLContext管理、上屏的操作以及后面将会重点介绍的外接纹理实现等等。</p>
+</li>
+<li><p>rasterize:<br> 光栅 LayerTree 进行光栅化操作</p>
+</li>
+</ol>
+<p>从图中可以看出，当Runtime完成Layout输出一个Layertree以后，在管线中会遍历Layertree的每一个叶子节点，每一个叶子节点最终会调用Skia引擎完成界面元素的绘制，在遍历完成后，在调用glPresentRenderBuffer（IOS）或者glSwapBuffer(Android)按完成上屏操作。</p>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>Flutter在与Native隔离的同时，也在Flutter Engine和Native之间竖立了一座大山，Flutter想要获取一些Native侧的高内存占用图像（摄像头帧、视频帧、相册图片等等）会变得困难重重。</p>
+<p>Flutter从基本原理上就决定了无法直接获取到这些数据，而Flutter定义的channel机制，从本质上说是提供了一个消息传送机制，用于图像等数据的传输必然引起内存和CPU的巨大消耗。</p>
+<h2 id="Texture-纹理对象"><a href="#Texture-纹理对象" class="headerlink" title="Texture 纹理对象"></a>Texture 纹理对象</h2><p>Flutter提供了一种特殊的机制：外接纹理 / Texture</p>
+<p>图中LayerTree最后有一个TextureLayer节点 </p>
+<p>当在Flutter里创建出一个Texture控件时，代表的是在这个控件上显示的数据，需要由Native提供。</p>
+<p>IOS端的TextureLayer节点的最终绘制代码；整体过程可以分为三步。</p>
+<ol>
+<li>调用external_texture copyPixelBuffer，获取CVPixelBuffer</li>
+<li>CVOpenGLESTextureCacheCreateTextureFromImage创建OpenGL的Texture(这个是真的Texture)</li>
+<li>将OpenGL Texture封装成SKImage，调用Skia的DrawImage完成绘制。</li>
+</ol>
+<h1 id="Flutter的线程结构："><a href="#Flutter的线程结构：" class="headerlink" title="Flutter的线程结构："></a>Flutter的线程结构：</h1><p>Flutter通常情况下会创建4个Runner，这里的TaskRunner类似于IOS的GCD，是以队列的方式执行任务的一种机制，通常情况下（一个Runner会对应一个线程，而Platform Runner会在跑在主线程）</p>
+<ol>
+<li>UI Runner</li>
+<li>GPU Runner 负责GPU的渲染相关操作。</li>
+<li>IO Runner 负责资源的加载操作。</li>
+<li>Platform Runner 运行在main thread上，负责所有Native与Flutter Engine的交互。</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/10/12/flutter%E7%BB%98%E5%88%B6%E6%B7%B1%E5%85%A5%E8%80%83%E7%A9%B6/" data-id="ckcli33tb0029186nat4ugxom" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2019/10/15/DartVM%E8%80%83%E7%A9%B6/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          DartVM考究
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/10/09/Android-Notification-Demos/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Android Notification Demos</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/">其他技能</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/">Flutter</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/Android/">Android</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/iOS/">iOS</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/">其他技能</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/Flutter/">Flutter</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%8E%9F%E7%90%86%E4%B8%8E%E5%9F%BA%E7%A1%80/">原理与基础</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dart/" rel="tag">dart</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/" rel="tag">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/" rel="tag">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kotlin/" rel="tag">kotlin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/net/" rel="tag">net</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/swift/" rel="tag">swift</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BD%AF%E4%BB%B6/" rel="tag">软件</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/c/" style="font-size: 17.5px;">c++</a> <a href="/tags/dart/" style="font-size: 20px;">dart</a> <a href="/tags/go/" style="font-size: 10px;">go</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/kotlin/" style="font-size: 12.5px;">kotlin</a> <a href="/tags/net/" style="font-size: 10px;">net</a> <a href="/tags/swift/" style="font-size: 12.5px;">swift</a> <a href="/tags/%E8%BD%AF%E4%BB%B6/" style="font-size: 15px;">软件</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/07/14/Github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2/">使用Github搭建博客</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/11/Dart-%E7%BC%96%E8%AF%91%E3%80%81%E5%90%AF%E5%8A%A8%E6%9C%8D%E5%8A%A1%E3%80%81%E5%92%8C%E6%B5%8B%E8%AF%95-web-%E5%BA%94%E7%94%A8%E7%9A%84-build-runner/">Dart 编译、启动服务、和测试 web 应用的 build_runner</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/07/LaTex-%E9%80%9F%E6%88%90%E6%89%8B%E5%86%8C/">LaTex 速成手册。</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/01/Dart-%E6%B3%A8%E8%A7%A3%EF%BC%8CAPT/">Dart 注解，APT</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/30/Flutter-%E5%8A%A8%E7%94%BB%E8%80%83%E7%A9%B6/">Flutter 动画考究</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 Kevin 刘洋<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

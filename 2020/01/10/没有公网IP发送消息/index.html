@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>研究：没有公网IP发送消息？ | Kevin Liu 的简单博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="认识这个问题需要如下几步；（觉得太长不看，可以直接查看stun server demo）  首先是IP、IP协议 由于IPv4 的IP地址不够用，出现了nat转发技术，出现了内网、外网IP之分   了解内网IP，外网IP，NAT工作机制 NAT本身就是个复杂的转发机制 NAT造成的网络结构，与穿透可行性    静态NAT：一个公网IP对应一个内部IP，一对一转换 动态NAT：N个公网IP对应M个内">
+<meta property="og:type" content="article">
+<meta property="og:title" content="研究：没有公网IP发送消息？">
+<meta property="og:url" content="http://yoursite.com/2020/01/10/%E6%B2%A1%E6%9C%89%E5%85%AC%E7%BD%91IP%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF/index.html">
+<meta property="og:site_name" content="Kevin Liu 的简单博客">
+<meta property="og:description" content="认识这个问题需要如下几步；（觉得太长不看，可以直接查看stun server demo）  首先是IP、IP协议 由于IPv4 的IP地址不够用，出现了nat转发技术，出现了内网、外网IP之分   了解内网IP，外网IP，NAT工作机制 NAT本身就是个复杂的转发机制 NAT造成的网络结构，与穿透可行性    静态NAT：一个公网IP对应一个内部IP，一对一转换 动态NAT：N个公网IP对应M个内">
+<meta property="og:locale" content="zh">
+<meta property="og:image" content="http://yoursite.com/2020/01/10/%E6%B2%A1%E6%9C%89%E5%85%AC%E7%BD%91IP%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF/532288-20170726190839609-188399264.png">
+<meta property="article:published_time" content="2020-01-10T08:14:34.000Z">
+<meta property="article:modified_time" content="2020-07-14T04:37:13.094Z">
+<meta property="article:author" content="Kevin 刘洋">
+<meta property="article:tag" content="go">
+<meta property="article:tag" content="net">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/01/10/%E6%B2%A1%E6%9C%89%E5%85%AC%E7%BD%91IP%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF/532288-20170726190839609-188399264.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Kevin Liu 的简单博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Kevin Liu 的简单博客</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">全干工程师</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-没有公网IP发送消息" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/01/10/%E6%B2%A1%E6%9C%89%E5%85%AC%E7%BD%91IP%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF/" class="article-date">
+  <time datetime="2020-01-10T08:14:34.000Z" itemprop="datePublished">2020-01-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%8E%9F%E7%90%86%E4%B8%8E%E5%9F%BA%E7%A1%80/">原理与基础</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      研究：没有公网IP发送消息？
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>认识这个问题需要如下几步；（觉得太长不看，可以直接查看stun server demo）</p>
+<ol>
+<li>首先是IP、IP协议<ul>
+<li>由于IPv4 的IP地址不够用，出现了nat转发技术，出现了内网、外网IP之分</li>
+</ul>
+</li>
+<li>了解内网IP，外网IP，NAT工作机制<ul>
+<li>NAT本身就是个复杂的转发机制</li>
+<li>NAT造成的网络结构，与穿透可行性<ul>
+<li><img src="./532288-20170726190839609-188399264.png" alt="">  </li>
+<li>静态NAT：一个公网IP对应一个内部IP，一对一转换</li>
+<li>动态NAT：N个公网IP对应M个内部IP，不固定的一对一转换关系</li>
+<li>对称NAT是一个请求对应一个端口，</li>
+<li>非对称NAT是多个请求对应一个端口(象锥形，所以叫Cone NAT)。<a id="more"></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>了解NAT打洞<ul>
+<li>P2P打洞基本上都是基于UDP协议<ul>
+<li>TCP可以但是更复杂、因为NAT设备是根据端口号来确定session，TCP端口号绑定是固定的，不能多个session绑定一个端口收发数据</li>
+</ul>
+</li>
+<li>UDP打洞步骤<ol>
+<li>A、B都要发送数据到公网某某Server，S得到了A、B公网IP</li>
+<li>S发送NAT-A数据，数据到达A；S发送NAT-B数据，数据到达B</li>
+<li>A发送数据给B，即NAT-A发送给NAT-B，反之亦然。</li>
+<li>为了保证A、B的路由上有Session，双方应该互有心跳包。保证信道存活</li>
+</ol>
+</li>
+<li>TCP打洞，因复杂 略</li>
+</ul>
+</li>
+<li>一些常用技术<ul>
+<li>ALG（应用层网关）：它可以是一个设备或插件，用于支持SIP协议，主要类似与在网关上专门开辟一个通道，用于建立内网与外网的连接，也就是说，这是一种定制的网关。更多只适用于使用他们的应用群体内部之间。</li>
+<li>UpnP：它是让网关设备在进行工作时寻找一个全球共享的可路由IP来作为通道，这样避免端口造成的影响。要求设备支持且开启upnp功能，但大部分时候，这些功能处于安全考虑，是被关闭的。即时开启，实际应用效果还没经过测试。</li>
+<li>STUN（Simple Traversalof UDP Through Network）：这种方式即是类似于我们上面举例中服务器C的处理方式。也是目前普遍采用的方式。但具体实现要比我们描述的复杂许多，光是做网关Nat类型判断就由许多工作，RFC3489中详细描述了。</li>
+<li>TURN(Traveral Using Relay NAT)：该方式是将所有的数据交换都经由服务器来完成，这样NAT将没有障碍，但服务器的负载、丢包、延迟性就是很大的问题。目前很多游戏均采用该方式避开NAT的问题。这种方式不叫p2p。</li>
+<li>ICE(Interactive Connectivity Establishment)：是对上述各种技术的综合，但明显带来了复杂性。</li>
+</ul>
+</li>
+</ol>
+<h1 id="NAT-4种形态"><a href="#NAT-4种形态" class="headerlink" title="NAT 4种形态"></a>NAT 4种形态</h1><p>1)Full-cone NAT, also known as one-to-one NAT</p>
+<ul>
+<li>一旦一个内网地址 (iAddr:iPort) 被映射到一个外部地址 (eAddr:ePort), 来自 iAddr:iPort 的任何数据包将通过 eAddr:ePort 发送.</li>
+<li>任何外部主机能够通过eAddr:ePort这个地址发送数据包到iAddr:iPort.</li>
+</ul>
+<p>2)Address-restricted-cone NAT</p>
+<ul>
+<li>一旦一个内网地址 (iAddr:iPort) 被映射到一个外部地址 (eAddr:ePort), 来自 iAddr:iPort 的任何数据包将通过 eAddr:ePort 发送.</li>
+<li>仅只有接收到主机(iAddr:iPort)通过eAddr:ePort发送的数据包的外部主机通过该主机的任何端口发送到eAddr:ePort的数据包才能够被正确的转发到iAddr:iPort.也就是说主机有关端口无关.</li>
+</ul>
+<p>3)Port-restricted cone NAT</p>
+<p>类似于address restricted cone NAT, 但是端口号有限制.</p>
+<ul>
+<li>一旦一个内网地址 (iAddr:iPort) 被映射到一个外部地址 (eAddr:ePort), 来自 iAddr:iPort 的任何数据包将通过 eAddr:ePort 发送.</li>
+<li>仅只有接收到主机(iAddr:iPort)通过eAddr:ePort发送的数据包的外部主机通过该主机的相同端口发送到eAddr:ePort的数据包才能够被正确的转发到iAddr:iPort.</li>
+</ul>
+<p>4)Symmetric NAT （对称类型）</p>
+<ul>
+<li>来自相同内部ip和port发送到相同目的地ip和port的请求被映射到唯一的外部ip和port地址；如果相同的内部主机采用相同的ip和port地址发送到不同的目的地，那么重新分配映射地址。</li>
+<li>只有先前收到内部主机发送的包的外部主机才能够发送返回包到内部主机。</li>
+</ul>
+<blockquote>
+<p>1-3种都叫锥型网络结构，因为是多个内部IP映射到一个外部IP上；是多对一的结构。打洞即可通过这个外部IP映射  </p>
+<p>4 对称类型，歙砚个不能实现打洞，因为其每次访问，ip端口都是不一样的。</p>
+</blockquote>
+<h1 id="STUN-Server-Demo"><a href="#STUN-Server-Demo" class="headerlink" title="STUN Server Demo"></a>STUN Server Demo</h1><p>语言：Go，</p>
+<p>材料：一台有公网的服务器，两台能上网的设备</p>
+<p>网络结构：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Server S</span><br><span class="line">                    207.148.70.129:9981</span><br><span class="line">                           |</span><br><span class="line">                           |</span><br><span class="line">    +----------------------|----------------------+</span><br><span class="line">    |                                             |</span><br><span class="line">  NAT A                                         NAT B</span><br><span class="line">120.27.209.161:6000                            120.26.10.118:3000</span><br><span class="line">    |                                             |</span><br><span class="line">    |                                             |</span><br><span class="line"> Client A                                      Client B</span><br><span class="line">  10.0.0.1:9982                                 192.168.0.1:9982</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Server逻辑为。接受2个UDP的数据包。并且保存NAT-A、NAT-B的相关信息。收到2个数据包后，发送给A、B相互的地址，并结束自己</li>
+<li>Client逻辑，为发包给Server后，等待server持续发送包</li>
+</ul>
+<blockquote>
+<p>这里我再测试时没有准备A、B两个设备。<code>Client A</code>运行一次后结束。server记录了NAT-A，随后我再次启动<code>Client A</code>，server将NAT-A地址返回。随后<code>Client A</code>开始了自己跟自己打洞的操作。</p>
+</blockquote>
+<p>server</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">	<span class="string">"net"</span></span><br><span class="line">	<span class="string">"time"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build server.go</span></span><br><span class="line">	listener, err := net.ListenUDP(<span class="string">"udp"</span>, &amp;net.UDPAddr&#123;IP: net.IPv4zero, Port: <span class="number">9981</span>&#125;)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Println(err)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	log.Printf(<span class="string">"本地地址: &lt;%s&gt; \n"</span>, listener.LocalAddr().String())</span><br><span class="line">	peers := <span class="built_in">make</span>([]net.UDPAddr, <span class="number">0</span>, <span class="number">2</span>)</span><br><span class="line">	data := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="number">1024</span>)</span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		n, remoteAddr, err := listener.ReadFromUDP(data)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			fmt.Printf(<span class="string">"error during read: %s"</span>, err)</span><br><span class="line">		&#125;</span><br><span class="line">		log.Printf(<span class="string">"&lt;%s&gt; %s\n"</span>, remoteAddr.String(), data[:n])</span><br><span class="line">		peers = <span class="built_in">append</span>(peers, *remoteAddr)</span><br><span class="line">		<span class="keyword">if</span> <span class="built_in">len</span>(peers) == <span class="number">2</span> &#123;</span><br><span class="line">			log.Printf(<span class="string">"进行UDP打洞,建立 %s &lt;--&gt; %s 的连接\n"</span>, peers[<span class="number">0</span>].String(), peers[<span class="number">1</span>].String())</span><br><span class="line">			listener.WriteToUDP([]<span class="keyword">byte</span>(peers[<span class="number">1</span>].String()), &amp;peers[<span class="number">0</span>])</span><br><span class="line">			listener.WriteToUDP([]<span class="keyword">byte</span>(peers[<span class="number">0</span>].String()), &amp;peers[<span class="number">1</span>])</span><br><span class="line">			time.Sleep(time.Second * <span class="number">8</span>)</span><br><span class="line">			log.Println(<span class="string">"中转服务器退出,仍不影响peers间通信"</span>)</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>client</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"log"</span></span><br><span class="line">	<span class="string">"net"</span></span><br><span class="line">	<span class="string">"strconv"</span></span><br><span class="line">	<span class="string">"strings"</span></span><br><span class="line">	<span class="string">"time"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> tag <span class="keyword">string</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> HAND_SHAKE_MSG = <span class="string">"我是打洞消息"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// 当前进程标记字符串,便于显示</span></span><br><span class="line">	<span class="comment">//tag = os.Args[1]</span></span><br><span class="line">	tag = <span class="string">"aa"</span></span><br><span class="line">	srcAddr := &amp;net.UDPAddr&#123;IP: net.IPv4zero, Port: <span class="number">9982</span>&#125; <span class="comment">// 注意端口必须固定</span></span><br><span class="line">	dstAddr := &amp;net.UDPAddr&#123;IP: net.ParseIP(<span class="string">"39.100.81.37"</span>), Port: <span class="number">9981</span>&#125;</span><br><span class="line">	conn, err := net.DialUDP(<span class="string">"udp"</span>, srcAddr, dstAddr)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Println(err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> _, err = conn.Write([]<span class="keyword">byte</span>(<span class="string">"hello, I'm new peer:"</span> + tag)); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Panic(err)</span><br><span class="line">	&#125;</span><br><span class="line">	data := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="number">1024</span>)</span><br><span class="line">	n, remoteAddr, err := conn.ReadFromUDP(data)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Printf(<span class="string">"error during read: %s"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	conn.Close()</span><br><span class="line">	anotherPeer := parseAddr(<span class="keyword">string</span>(data[:n]))</span><br><span class="line">	fmt.Printf(<span class="string">"local:%s server:%s another:%s\n"</span>, srcAddr, remoteAddr, anotherPeer.String())</span><br><span class="line">	<span class="comment">// 开始打洞</span></span><br><span class="line">	bidirectionHole(srcAddr, &amp;anotherPeer)</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">parseAddr</span><span class="params">(addr <span class="keyword">string</span>)</span> <span class="title">net</span>.<span class="title">UDPAddr</span></span> &#123;</span><br><span class="line">	t := strings.Split(addr, <span class="string">":"</span>)</span><br><span class="line">	port, _ := strconv.Atoi(t[<span class="number">1</span>])</span><br><span class="line">	<span class="keyword">return</span> net.UDPAddr&#123;</span><br><span class="line">		IP:   net.ParseIP(t[<span class="number">0</span>]),</span><br><span class="line">		Port: port,</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">bidirectionHole</span><span class="params">(srcAddr *net.UDPAddr, anotherAddr *net.UDPAddr)</span></span> &#123;</span><br><span class="line">	conn, err := net.DialUDP(<span class="string">"udp"</span>, srcAddr, anotherAddr)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		fmt.Println(err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> conn.Close()</span><br><span class="line">	<span class="comment">// 向另一个peer发送一条udp消息(对方peer的nat设备会丢弃该消息,非法来源),用意是在自身的nat设备打开一条可进入的通道,这样对方peer就可以发过来udp消息</span></span><br><span class="line">	<span class="keyword">if</span> _, err = conn.Write([]<span class="keyword">byte</span>(HAND_SHAKE_MSG)); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Println(<span class="string">"send handshake:"</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		<span class="keyword">for</span> &#123;</span><br><span class="line">			time.Sleep(<span class="number">10</span> * time.Second)</span><br><span class="line">			<span class="keyword">if</span> _, err = conn.Write([]<span class="keyword">byte</span>(<span class="string">"from ["</span> + tag + <span class="string">"]"</span>)); err != <span class="literal">nil</span> &#123;</span><br><span class="line">				log.Println(<span class="string">"send msg fail"</span>, err)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		data := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="number">1024</span>)</span><br><span class="line">		n, _, err := conn.ReadFromUDP(data)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			log.Printf(<span class="string">"error during read: %s\n"</span>, err)</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			log.Printf(<span class="string">"收到数据:%s\n"</span>, data[:n])</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2020/01/10/%E6%B2%A1%E6%9C%89%E5%85%AC%E7%BD%91IP%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF/" data-id="ckcli33tf002q186needua0on" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/go/" rel="tag">go</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/net/" rel="tag">net</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2020/02/24/Flutter-Engine-%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Flutter Engine 源码阅读
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2019/12/16/Flutter%E6%BA%90%E7%A0%81%E9%80%9F%E8%A7%88/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Flutter源码速览</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/">其他技能</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/">Flutter</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/Android/">Android</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Flutter/iOS/">iOS</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/">其他技能</a><ul class="category-list-child"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%85%B6%E4%BB%96%E6%8A%80%E8%83%BD/Flutter/">Flutter</a></li></ul></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%8E%9F%E7%90%86%E4%B8%8E%E5%9F%BA%E7%A1%80/">原理与基础</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/c/" rel="tag">c++</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dart/" rel="tag">dart</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/" rel="tag">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/java/" rel="tag">java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kotlin/" rel="tag">kotlin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/net/" rel="tag">net</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/swift/" rel="tag">swift</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%BD%AF%E4%BB%B6/" rel="tag">软件</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/c/" style="font-size: 17.5px;">c++</a> <a href="/tags/dart/" style="font-size: 20px;">dart</a> <a href="/tags/go/" style="font-size: 10px;">go</a> <a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/kotlin/" style="font-size: 12.5px;">kotlin</a> <a href="/tags/net/" style="font-size: 10px;">net</a> <a href="/tags/swift/" style="font-size: 12.5px;">swift</a> <a href="/tags/%E8%BD%AF%E4%BB%B6/" style="font-size: 15px;">软件</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">July 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">June 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">May 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">April 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">March 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">February 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">December 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/07/14/Github%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2/">使用Github搭建博客</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/11/Dart-%E7%BC%96%E8%AF%91%E3%80%81%E5%90%AF%E5%8A%A8%E6%9C%8D%E5%8A%A1%E3%80%81%E5%92%8C%E6%B5%8B%E8%AF%95-web-%E5%BA%94%E7%94%A8%E7%9A%84-build-runner/">Dart 编译、启动服务、和测试 web 应用的 build_runner</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/07/LaTex-%E9%80%9F%E6%88%90%E6%89%8B%E5%86%8C/">LaTex 速成手册。</a>
+          </li>
+        
+          <li>
+            <a href="/2020/07/01/Dart-%E6%B3%A8%E8%A7%A3%EF%BC%8CAPT/">Dart 注解，APT</a>
+          </li>
+        
+          <li>
+            <a href="/2020/06/30/Flutter-%E5%8A%A8%E7%94%BB%E8%80%83%E7%A9%B6/">Flutter 动画考究</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 Kevin 刘洋<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+
+  
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>
